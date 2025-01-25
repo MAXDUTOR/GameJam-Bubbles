@@ -1,37 +1,28 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ExplosionEffect : MonoBehaviour
 {
-    public GameObject cubeDebrisPrefab; // Assign your CubeDebris prefab here
-    public int numberOfCubes = 10;    // Number of cubes to spawn
-    public float explosionForce = 10f; // Force of the explosion
-    public float explosionRadius = 5f; // Radius of the explosion
+    public GameObject[] meshParts; // Array ของ Prefab แต่ละส่วนของ Mesh
+    public float explosionForce = 10f; // แรงระเบิด
+    public float explosionRadius = 5f; // รัศมีการระเบิด
 
     public void Explode()
     {
-        // Spawn cubes in a random sphere around the explosion point
-        for (int i = 0; i < numberOfCubes; i++)
+        foreach (GameObject part in meshParts)
         {
-            // Calculate random position within the explosion radius
-            Vector3 randomPosition = Random.insideUnitSphere * explosionRadius;
-            randomPosition += transform.position; // Add the enemy's position
+            // สร้าง Instance ของ Mesh Part
+            GameObject partInstance = Instantiate(part, transform.position, transform.rotation);
 
-            // Instantiate the cube debris
-            GameObject cubeDebris = Instantiate(cubeDebrisPrefab, randomPosition, Quaternion.identity);
-
-            // Add force to the cube debris (if it has a Rigidbody)
-            Rigidbody rb = cubeDebris.GetComponent<Rigidbody>();
+            // เพิ่มแรงระเบิด
+            Rigidbody rb = partInstance.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                // Calculate direction vector from the explosion center to the debris
-                Vector3 explosionDirection = cubeDebris.transform.position - transform.position;
-
-                // Apply force outwards in the calculated direction
-                rb.AddForce(explosionDirection * explosionForce, ForceMode.Impulse);
+                rb.AddExplosionForce(explosionForce, transform.position, explosionRadius);
             }
 
-            // Optionally, destroy the cube debris after a certain time
-            //Destroy(cubeDebris, 2f); // Destroy after 2 seconds
+
+            // ทำลาย Mesh Part หลังจากเวลาผ่านไป (Optional)
+            Destroy(partInstance, 5f);
         }
     }
 }

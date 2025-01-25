@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 movement;
     private Vector3 currentVelocity;
+    private bool isRange = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -45,6 +46,12 @@ public class PlayerController : MonoBehaviour
         if (stateInfo.IsName("melee1") && stateInfo.normalizedTime >= 1f)
         {
             animator.ResetTrigger("hit");
+        }
+
+        if (Input.GetMouseButtonDown(1)) // ตรวจสอบว่าคลิกขวาหรือไม่
+        {
+            isRange = !isRange; // สลับค่า isRange
+            animator.SetBool("isRange", isRange); //  ตั้งค่า isRange ใน Animator
         }
         transform.Translate(currentVelocity * Time.deltaTime);
     }
