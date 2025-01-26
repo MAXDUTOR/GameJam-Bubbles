@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
+using System.Collections;
+using System.Collections.Generic;
 
 public class Enemy : MonoBehaviour
 {
@@ -8,7 +11,12 @@ public class Enemy : MonoBehaviour
 
     public GameObject prefabToInstantiate; // ลาก Prefab ที่ต้องการสร้างมาใส่ในช่องนี้
 
-
+    public Transform target;
+    public NavMeshAgent agent;
+    public float distance;
+    public Animator anim;
+    float nextAttackCount = 1;
+    bool nextAttack = false;
     void SpawnPrefabAtEnemyPosition()
     {
         // หาตำแหน่งของศัตรู
@@ -47,7 +55,9 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth; // กำหนด HP เริ่มต้น
-        // ลบ Die(); ออก 
+                                   // ลบ Die(); ออก 
+
+        agent = GetComponent<NavMeshAgent>();
     }
 
     public void TakeDamage(float damage)
@@ -63,7 +73,31 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        distance = Vector3.Distance(this.transform.position, target.position);
+        if (distance < 10)
+        {
+            agent.destination = target.position;
+            if (distance <= 2.5 && !nextAttack)
+            {
+                anim.SetTrigger("hit");
+                nextAttack = true;
+            }
+            else
+            {
+                nextAttackCount -= Time.deltaTime;
+                if (nextAttackCount <= 0)
+                {
+                    nextAttack = false;
+                }
+            }
+        }
+    }
 
+    public IEnumerator castDelay()
+    {
+        yield return new WaitForSeconds(1f);
+        anim.SetTrigger("hit");
+        StartCoroutine(castDelay());
     }
 
     void Die()
