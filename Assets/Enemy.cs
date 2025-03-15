@@ -74,8 +74,9 @@ public class Enemy : MonoBehaviour
     void Update()
     {
         distance = Vector3.Distance(this.transform.position, target.position);
-        if (distance < 10)
+        if (distance < 50)
         {
+            anim.SetBool("isRun", true); 
             agent.destination = target.position;
             if (distance <= 2.5 && !nextAttack)
             {
